@@ -1,0 +1,3 @@
+(library
+ (name arith)
+ (public_name arith))
