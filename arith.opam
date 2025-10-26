@@ -1,0 +1,15 @@
+opam-version: "2.0"
+name: "arith"
+version: "0.1"
+synopsis: "Arithmetic example project"
+maintainer: "unknown"
+authors: "unknown"
+depends: [
+  "ocaml" {>= "5.3.0"}
+  "dune" {>= "3.16"}
+]
+build: [
+  ["dune" "build" "-p" name "-j" jobs]
+]
+dev-repo: "git+file://."
+bug-reports: "https://example.com/does-not-exist"
