@@ -7,6 +7,7 @@ authors: "unknown"
 depends: [
   "ocaml" {>= "5.3.0"}
   "dune" {>= "3.16"}
+  "menhir" {build}
 ]
 build: [
   ["dune" "build" "-p" name "-j" jobs]
