@@ -1,0 +1,9 @@
+(executables
+ (names parser_driver)
+ (libraries arith)
+ (modules parser_driver))
+
+(rule
+ (alias runtest)
+ (deps (glob_files programs/*.lambda))
+ (action (run %{exe:parser_driver.exe} %{deps})))
