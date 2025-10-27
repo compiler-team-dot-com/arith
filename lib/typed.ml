@@ -440,6 +440,7 @@ module Elaborate (S : Symantics) = struct
     (annotated.typ, eval Empty annotated)
 end
 
+(** Runtime result packaged with its type witness. *)
 type eval_result = Eval_result : 'a ty * 'a -> eval_result
 
 (** Type-checks and evaluates an expression using the [Eval] interpreter.
