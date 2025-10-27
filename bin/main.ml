@@ -10,7 +10,7 @@ let parse_and_print source =
       (match Typed.evaluate ast with
       | Ok (typ, value) ->
           Printf.printf "Type: %s\n" (Ast.typ_to_string typ);
-          Printf.printf "Eval: %s\n" (string_of_eval_result value);
+          Printf.printf "Eval: %s\n" (Typed.string_of_eval_result value);
           (match Typed.pretty ast with
           | Ok (_, pretty) ->
               Printf.printf "Pretty (typed): %s\n" pretty

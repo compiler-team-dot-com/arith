@@ -32,13 +32,3 @@ let parse_file filename =
       parse_expression contents)
 
 let expr_to_string = Ast.to_string
-
-let string_of_eval_result (Typed.Eval_result (ty, value)) =
-  let aux : type a. a Typed.ty -> a -> string =
-   fun ty value ->
-    match ty with
-    | Typed.TInt -> string_of_int value
-    | Typed.TBool -> string_of_bool value
-    | Typed.TArrow _ -> "<fun>"
-  in
-  aux ty value

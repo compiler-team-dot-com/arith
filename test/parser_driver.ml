@@ -7,7 +7,7 @@ let run_file path =
       (match Typed.evaluate expr with
       | Ok (typ, value) ->
           Printf.printf "  Type: %s\n" (Ast.typ_to_string typ);
-          Printf.printf "  Eval: %s\n" (string_of_eval_result value)
+          Printf.printf "  Eval: %s\n" (Typed.string_of_eval_result value)
       | Error msg -> Printf.printf "  Type error: %s\n" msg)
   | exception Parse_error msg ->
       prerr_endline (Printf.sprintf "Error in %s: %s" path msg);

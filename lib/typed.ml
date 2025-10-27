@@ -443,6 +443,18 @@ end
 (** Runtime result packaged with its type witness. *)
 type eval_result = Eval_result : 'a ty * 'a -> eval_result
 
+(** Converts a runtime result into a human-readable string, collapsing functions
+    to a placeholder while showing primitive values. *)
+let string_of_eval_result (Eval_result (ty, value)) =
+  let aux : type a. a ty -> a -> string =
+   fun ty value ->
+    match ty with
+    | TInt -> string_of_int value
+    | TBool -> string_of_bool value
+    | TArrow _ -> "<fun>"
+  in
+  aux ty value
+
 (** Type-checks and evaluates an expression using the [Eval] interpreter.
     Returns the inferred type and runtime value when successful. *)
 let evaluate expr =
