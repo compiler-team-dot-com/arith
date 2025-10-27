@@ -81,22 +81,6 @@ module Pretty : Symantics with type 'a repr = string = struct
     "(let " ^ v ^ " = " ^ value ^ " in " ^ body v ^ ")"
 end
 
-module Example (S : Symantics) = struct
-  open S
-
-  let identity = lam (fun x -> x)
-
-  let program =
-    let_ identity (fun id ->
-        let_ (int 42) (fun answer -> app id answer))
-
-  let conditional =
-    if_ (bool true) (int 1) (int 0)
-
-  let arithmetic =
-    add (int 10) (mul (int 2) (int 5))
-end
-
 exception Type_error of string
 
 type _ ty =
@@ -282,11 +266,6 @@ module Elaborate (S : Symantics) = struct
     | Bind (n, ty, value, rest) ->
         if String.equal n name then Pack (ty, value) else lookup rest name
 
-  let expect_ty expected actual msg =
-    match equal_ty expected actual with
-    | Some Refl -> ()
-    | None -> raise (Type_error msg)
-
   (* [coerce expected actual value msg] reuses [value] when the type witnesses
      agree, otherwise raises a [Type_error] with [msg]. It is used to placate
      the OCaml type checker when unpacking existential witnesses. *)
@@ -440,11 +419,10 @@ module Elaborate (S : Symantics) = struct
     (annotated.typ, eval Empty annotated)
 end
 
-(** Runtime result packaged with its type witness. *)
 type eval_result = Eval_result : 'a ty * 'a -> eval_result
 
-(** Converts a runtime result into a human-readable string, collapsing functions
-    to a placeholder while showing primitive values. *)
+(* Convert a runtime result into a human-readable string, collapsing functions
+   to a placeholder while showing primitive values. *)
 let string_of_eval_result (Eval_result (ty, value)) =
   let aux : type a. a ty -> a -> string =
    fun ty value ->
@@ -455,8 +433,8 @@ let string_of_eval_result (Eval_result (ty, value)) =
   in
   aux ty value
 
-(** Type-checks and evaluates an expression using the [Eval] interpreter.
-    Returns the inferred type and runtime value when successful. *)
+(* Type-check and evaluate an expression using the [Eval] interpreter,
+   returning its inferred type alongside the runtime value. *)
 let evaluate expr =
   let module E = Elaborate (Eval) in
   try
@@ -465,8 +443,8 @@ let evaluate expr =
     | E.Pack (ty, value) -> Ok (typ, Eval_result (ty, value))
   with Type_error msg -> Error msg
 
-(** Type-checks and pretty-prints an expression using the [Pretty] interpreter.
-    Returns the inferred type and human-readable form when successful. *)
+(* Type-check and pretty-print an expression, returning its type and surface
+   form. *)
 let pretty expr =
   let module P = Elaborate (Pretty) in
   try
@@ -474,7 +452,3 @@ let pretty expr =
     match packed with
     | P.Pack (_, repr) -> Ok (typ, repr)
   with Type_error msg -> Error msg
-
-(** Runs only the type checker, returning the annotated AST when successful. *)
-let type_check expr =
-  try Ok (Typecheck.check expr) with Type_error msg -> Error msg

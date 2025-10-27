@@ -22,12 +22,31 @@ let parse_and_print source =
       exit 1
 
 let show_typed_examples () =
-  let module EvalExample = Typed.Example (Typed.Eval) in
-  let module PrettyExample = Typed.Example (Typed.Pretty) in
-  Printf.printf "Typed program (eval): %d\n" EvalExample.program;
-  Printf.printf "Typed program (pretty): %s\n" PrettyExample.program;
-  Printf.printf "Typed conditional (eval): %d\n" EvalExample.conditional;
-  Printf.printf "Typed arithmetic (pretty): %s\n" PrettyExample.arithmetic
+  let samples =
+    [
+      ( "identity"
+      , "let id = fun (x : int) -> x in id 42" );
+      ( "conditional", "if true then 1 else 0" );
+      ( "arithmetic", "10 + (2 * 5)" );
+    ]
+  in
+  List.iter
+    (fun (label, program) ->
+      Printf.printf "Example (%s): %s\n" label program;
+      match parse_expression program with
+      | exception Parse_error msg ->
+          Printf.printf "  Parse error: %s\n" msg
+      | ast -> (
+          match Typed.evaluate ast with
+          | Ok (typ, value) ->
+              Printf.printf "  Type: %s\n" (Ast.typ_to_string typ);
+              Printf.printf "  Eval: %s\n"
+                (Typed.string_of_eval_result value);
+              (match Typed.pretty ast with
+              | Ok (_, pretty) -> Printf.printf "  Pretty: %s\n" pretty
+              | Error msg -> Printf.printf "  Pretty error: %s\n" msg)
+          | Error msg -> Printf.printf "  Type error: %s\n" msg))
+    samples
 
 let () =
   let program =
