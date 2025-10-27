@@ -1,11 +1,22 @@
 open Arith
 
-let default_program = "let id = fun x -> x in id 42"
+let default_program = "let id = fun (x : int) -> x in id 42"
 
 let parse_and_print source =
   match parse_expression source with
   | ast ->
       Printf.printf "Parsed expression: %s\n" (expr_to_string ast)
+      ;
+      (match Typed.evaluate ast with
+      | Ok (typ, value) ->
+          Printf.printf "Type: %s\n" (Ast.typ_to_string typ);
+          Printf.printf "Eval: %s\n" (string_of_eval_result value);
+          (match Typed.pretty ast with
+          | Ok (_, pretty) ->
+              Printf.printf "Pretty (typed): %s\n" pretty
+          | Error msg ->
+              Printf.printf "Pretty error: %s\n" msg)
+      | Error msg -> Printf.printf "Type error: %s\n" msg)
   | exception Parse_error msg ->
       prerr_endline ("Parse error: " ^ msg);
       exit 1
@@ -13,11 +24,8 @@ let parse_and_print source =
 let show_typed_examples () =
   let module EvalExample = Typed.Example (Typed.Eval) in
   let module PrettyExample = Typed.Example (Typed.Pretty) in
-  let module ReifyExample = Typed.Example (Typed.Reify) in
   Printf.printf "Typed program (eval): %d\n" EvalExample.program;
   Printf.printf "Typed program (pretty): %s\n" PrettyExample.program;
-  Printf.printf "Typed program (AST): %s\n"
-    (expr_to_string ReifyExample.program);
   Printf.printf "Typed conditional (eval): %d\n" EvalExample.conditional;
   Printf.printf "Typed arithmetic (pretty): %s\n" PrettyExample.arithmetic
 

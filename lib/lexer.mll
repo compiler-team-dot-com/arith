@@ -12,6 +12,8 @@
    | "else" -> ELSE
    | "true" -> TRUE
    | "false" -> FALSE
+   | "int" -> TYPE_INT
+   | "bool" -> TYPE_BOOL
    | ident -> IDENT ident
 }
 
@@ -30,6 +32,7 @@ rule token =
   | "||" { OR }
   | '(' { LPAREN }
   | ')' { RPAREN }
+  | ':' { COLON }
   | '+' { PLUS }
   | '-' { MINUS }
   | '*' { TIMES }
