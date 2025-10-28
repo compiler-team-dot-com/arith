@@ -3,6 +3,6 @@
  (public_name arith))
 
 (menhir
- (modules parser))
+ (modules grammar))
 
 (ocamllex lexer)

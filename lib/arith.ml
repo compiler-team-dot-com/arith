@@ -12,9 +12,9 @@ let pp_position lexbuf =
 
 let parse_expression source =
   let lexbuf = Lexing.from_string source in
-  try Parser.program Lexer.token lexbuf with
+  try Grammar.program Lexer.token lexbuf with
   | Lexer.Error msg -> raise (Parse_error msg)
-  | Parser.Error ->
+  | Grammar.Error ->
       let loc = pp_position lexbuf in
       raise (Parse_error ("Parse error at " ^ loc))
 

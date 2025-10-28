@@ -1,5 +1,5 @@
 {
- open Parser
+ open Grammar
 
  exception Error of string
 
