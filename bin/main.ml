@@ -56,4 +56,5 @@ let () =
       default_program
   in
   parse_and_print program;
+  print_endline "";
   show_typed_examples ()
