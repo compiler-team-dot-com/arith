@@ -1,7 +1,7 @@
-open Arith
+open Lib
 
 let run_file path =
-  match parse_file path with
+  match Parser.parse_file path with
   | expr ->
       Printf.printf "Parsed %s => %s\n" path (Ast.to_string expr);
       (match Typed.evaluate expr with
@@ -9,7 +9,7 @@ let run_file path =
           Printf.printf "  Type: %s\n" (Ast.typ_to_string typ);
           Printf.printf "  Eval: %s\n" (Typed.string_of_eval_result value)
       | Error msg -> Printf.printf "  Type error: %s\n" msg)
-  | exception Parse_error msg ->
+  | exception Parser.Parse_error msg ->
       prerr_endline (Printf.sprintf "Error in %s: %s" path msg);
       exit 1
 

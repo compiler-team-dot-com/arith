@@ -1,6 +1,6 @@
 (executables
  (names parser_driver)
- (libraries arith)
+ (libraries lib)
  (modules parser_driver))
 
 (rule

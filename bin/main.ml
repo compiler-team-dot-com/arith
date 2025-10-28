@@ -1,9 +1,9 @@
-open Arith
+open Lib
 
 let default_program = "let id = fun (x : int) -> x in id 42"
 
 let parse_and_print source =
-  match parse_expression source with
+  match Parser.parse_expression source with
   | ast ->
       Printf.printf "Parsed expression: %s\n" (Ast.to_string ast)
       ;
@@ -17,7 +17,7 @@ let parse_and_print source =
           | Error msg ->
               Printf.printf "Pretty error: %s\n" msg)
       | Error msg -> Printf.printf "Type error: %s\n" msg)
-  | exception Parse_error msg ->
+  | exception Parser.Parse_error msg ->
       prerr_endline ("Parse error: " ^ msg);
       exit 1
 
@@ -33,8 +33,8 @@ let show_typed_examples () =
   List.iter
     (fun (label, program) ->
       Printf.printf "Example (%s): %s\n" label program;
-      match parse_expression program with
-      | exception Parse_error msg ->
+      match Parser.parse_expression program with
+      | exception Parser.Parse_error msg ->
           Printf.printf "  Parse error: %s\n" msg
       | ast -> (
           match Typed.evaluate ast with

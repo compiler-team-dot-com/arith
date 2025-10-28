@@ -1,6 +1,5 @@
 (library
- (name arith)
- (public_name arith))
+ (name lib))
 
 (menhir
  (modules grammar))

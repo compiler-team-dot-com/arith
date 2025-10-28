@@ -1,6 +1,3 @@
-module Ast = Ast
-module Typed = Typed
-
 exception Parse_error of string
 
 let pp_position lexbuf =
