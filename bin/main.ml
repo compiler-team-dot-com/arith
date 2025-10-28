@@ -5,7 +5,7 @@ let default_program = "let id = fun (x : int) -> x in id 42"
 let parse_and_print source =
   match parse_expression source with
   | ast ->
-      Printf.printf "Parsed expression: %s\n" (expr_to_string ast)
+      Printf.printf "Parsed expression: %s\n" (Ast.to_string ast)
       ;
       (match Typed.evaluate ast with
       | Ok (typ, value) ->

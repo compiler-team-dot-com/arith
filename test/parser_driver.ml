@@ -3,7 +3,7 @@ open Arith
 let run_file path =
   match parse_file path with
   | expr ->
-      Printf.printf "Parsed %s => %s\n" path (expr_to_string expr);
+      Printf.printf "Parsed %s => %s\n" path (Ast.to_string expr);
       (match Typed.evaluate expr with
       | Ok (typ, value) ->
           Printf.printf "  Type: %s\n" (Ast.typ_to_string typ);

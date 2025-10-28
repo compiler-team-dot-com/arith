@@ -3,10 +3,6 @@ module Typed = Typed
 
 exception Parse_error of string
 
-let add a b = a + b
-
-let subtract a b = a - b
-
 let pp_position lexbuf =
   let open Lexing in
   let pos = lexbuf.lex_curr_p in
@@ -30,5 +26,3 @@ let parse_file filename =
       let length = in_channel_length channel in
       let contents = really_input_string channel length in
       parse_expression contents)
-
-let expr_to_string = Ast.to_string
