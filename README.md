@@ -15,7 +15,7 @@ The project is organised into a few modules:
 - `lib/ast.ml` defines the untyped syntax tree and helpers for pretty-printing expressions.
 - `lib/lexer.mll` and `lib/parser.mly` implement the tokenizer and Menhir grammar. Lambda parameters must be annotated (`fun (x : int) -> ...`), and let bindings may optionally carry annotations. The grammar enforces usual precedence for application and arithmetic operators.
 - `lib/typed.ml` houses the tagless-final infrastructure. It declares the `Symantics` interface, concrete interpreters (`Eval`, `Pretty`), the type witness GADT, the `Annotated` tree produced by the checker, the type checker/elaborator, and public helpers (`evaluate`, `pretty`, `string_of_eval_result`). An `.mli` file exports only what callers need.
-- `lib/arith.ml` exposes parsing utilities (`parse_expression`, `parse_file`, `expr_to_string`) and reexports `Typed` to applications.
+- `lib/lib.ml` reexports the main submodules (`Ast`, `Parser`, `Typed`) so applications can access them via `Lib`.
 - `bin/main.ml` provides a CLI that parses input, displays the AST, runs the typed evaluator, and shows a few sample programs.
 - `test/parser_driver.ml` reads `.lambda` fixtures from `test/programs/` and ensures they parse, type-check, and evaluate; this is wired into `dune build @runtest`.
 
@@ -35,14 +35,16 @@ The CLI prints the parsed AST, the inferred type and value, and a typed pretty-p
 From OCaml code you can parse and evaluate expressions programmatically:
 
 ```ocaml
-let expr = Arith.parse_expression "let id = fun (x : int) -> x in id 42" in
-match Arith.Typed.evaluate expr with
-| Ok (typ, value) ->
-    Printf.printf "Type: %s\n" (Arith.Ast.typ_to_string typ);
-    Printf.printf "Value: %s\n" (Arith.Typed.string_of_eval_result value)
-| Error msg -> Printf.eprintf "Type error: %s\n" msg
+match Lib.Parser.parse_expression "let id = fun (x : int) -> x in id 42" with
+| Ok expr -> (
+    match Lib.Typed.evaluate expr with
+    | Ok (typ, value) ->
+        Printf.printf "Type: %s\n" (Lib.Ast.typ_to_string typ);
+        Printf.printf "Value: %s\n" (Lib.Typed.string_of_eval_result value)
+    | Error msg -> Printf.eprintf "Type error: %s\n" msg)
+| Error msg -> Printf.eprintf "Parse error: %s\n" msg
 ```
-You can also call `Arith.Typed.pretty` to obtain the type-directed pretty-print of a checked program.
+You can also call `Lib.Typed.pretty` to obtain the type-directed pretty-print of a checked program.
 
 ### Tests
 

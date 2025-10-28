@@ -4,7 +4,7 @@ let default_program = "let id = fun (x : int) -> x in id 42"
 
 let parse_and_print source =
   match Parser.parse_expression source with
-  | ast ->
+  | Ok ast ->
       Printf.printf "Parsed expression: %s\n" (Ast.to_string ast)
       ;
       (match Typed.evaluate ast with
@@ -17,7 +17,7 @@ let parse_and_print source =
           | Error msg ->
               Printf.printf "Pretty error: %s\n" msg)
       | Error msg -> Printf.printf "Type error: %s\n" msg)
-  | exception Parser.Parse_error msg ->
+  | Error msg ->
       prerr_endline ("Parse error: " ^ msg);
       exit 1
 
@@ -34,9 +34,8 @@ let show_typed_examples () =
     (fun (label, program) ->
       Printf.printf "Example (%s): %s\n" label program;
       match Parser.parse_expression program with
-      | exception Parser.Parse_error msg ->
-          Printf.printf "  Parse error: %s\n" msg
-      | ast -> (
+      | Error msg -> Printf.printf "  Parse error: %s\n" msg
+      | Ok ast -> (
           match Typed.evaluate ast with
           | Ok (typ, value) ->
               Printf.printf "  Type: %s\n" (Ast.typ_to_string typ);
