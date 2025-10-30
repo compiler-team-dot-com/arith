@@ -27,6 +27,7 @@ rule token =
   parse
   | [' ' '\t' '\r' '\n'] { token lexbuf }
   | "(*" { comment lexbuf; token lexbuf }
+  | "--" { line_comment lexbuf }
   | "->" { ARROW }
   | "&&" { AND }
   | "||" { OR }
@@ -51,3 +52,9 @@ and comment =
   | "*)" { () }
   | eof { raise (Error "Unterminated comment") }
   | _ { comment lexbuf }
+
+and line_comment =
+  parse
+  | '\n' { token lexbuf }
+  | eof { EOF }
+  | _ { line_comment lexbuf }
