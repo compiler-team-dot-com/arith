@@ -1,16 +1,5 @@
-type binop =
-  | Add
-  | Sub
-  | Mul
-  | Div
-  | Eq
-  | And
-  | Or
-
-type typ =
-  | TInt
-  | TBool
-  | TArrow of typ * typ
+type binop = Add | Sub | Mul | Div | Eq | And | Or
+type typ = TInt | TBool | TArrow of typ * typ
 
 type expr =
   | Int of int

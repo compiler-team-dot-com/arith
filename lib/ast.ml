@@ -1,16 +1,5 @@
-type binop =
-  | Add
-  | Sub
-  | Mul
-  | Div
-  | Eq
-  | And
-  | Or
-
-type typ =
-  | TInt
-  | TBool
-  | TArrow of typ * typ
+type binop = Add | Sub | Mul | Div | Eq | And | Or
+type typ = TInt | TBool | TArrow of typ * typ
 
 type expr =
   | Int of int
@@ -51,9 +40,7 @@ let rec to_string = function
   | App (fn, arg) -> "(" ^ to_string fn ^ " " ^ to_string arg ^ ")"
   | Let (name, annot, value, body) ->
       let annot_str =
-        match annot with
-        | None -> ""
-        | Some t -> " : " ^ typ_to_string t
+        match annot with None -> "" | Some t -> " : " ^ typ_to_string t
       in
       "let " ^ name ^ annot_str ^ " = " ^ to_string value ^ " in "
       ^ to_string body
@@ -61,5 +48,4 @@ let rec to_string = function
       "if " ^ to_string cond ^ " then " ^ to_string t_branch ^ " else "
       ^ to_string f_branch
   | BinOp (op, lhs, rhs) ->
-      "(" ^ to_string lhs ^ " " ^ binop_to_string op ^ " " ^ to_string rhs
-      ^ ")"
+      "(" ^ to_string lhs ^ " " ^ binop_to_string op ^ " " ^ to_string rhs ^ ")"

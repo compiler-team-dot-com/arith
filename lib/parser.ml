@@ -1,8 +1,7 @@
 let pp_position lexbuf =
   let open Lexing in
   let pos = lexbuf.lex_curr_p in
-  Printf.sprintf "line %d, column %d"
-    pos.pos_lnum
+  Printf.sprintf "line %d, column %d" pos.pos_lnum
     (pos.pos_cnum - pos.pos_bol + 1)
 
 let parse_expression source =

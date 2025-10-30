@@ -2,9 +2,9 @@ open Lib
 
 let run_file path =
   match Parser.parse_file path with
-  | Ok expr ->
+  | Ok expr -> (
       Printf.printf "Parsed %s => %s\n" path (Ast.to_string expr);
-      (match Typed.evaluate expr with
+      match Typed.evaluate expr with
       | Ok (typ, value) ->
           Printf.printf "  Type: %s\n" (Ast.typ_to_string typ);
           Printf.printf "  Eval: %s\n" (Typed.string_of_eval_result value)
