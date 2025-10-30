@@ -1,0 +1,2 @@
+-- expect: error Function expected argument of type int but got bool
+let identity = fun (x : int) -> fun (y : int) -> x in let use = identity true in use false

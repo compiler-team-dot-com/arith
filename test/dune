@@ -1,9 +1,11 @@
 (executables
  (names parser_driver)
- (libraries lib)
+ (libraries lib alcotest)
  (modules parser_driver))
 
 (rule
  (alias runtest)
- (deps (glob_files programs/*.lambda))
- (action (run %{exe:parser_driver.exe} %{deps})))
+ (deps
+  (glob_files programs/*.lambda))
+ (action
+  (run %{exe:parser_driver.exe})))
