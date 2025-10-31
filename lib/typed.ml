@@ -16,6 +16,49 @@ module type Symantics = sig
   val let_ : 'a repr -> ('a repr -> 'b repr) -> 'b repr
 end
 
+[@@@ocaml.warning "-32"]
+
+module type Symantics_with_pairs = sig
+  include Symantics
+
+  type ('a, 'b) pair_repr
+
+  val pair : 'a repr -> 'b repr -> ('a, 'b) pair_repr
+  val fst : ('a, 'b) pair_repr -> 'a repr
+  val snd : ('a, 'b) pair_repr -> 'b repr
+end
+
+[@@@ocaml.warning "+32"]
+
+module Derived (S : Symantics) :
+  Symantics_with_pairs with type 'a repr = 'a S.repr = struct
+  include S
+
+  (* Church-encoded pair: record holds only its eliminator. *)
+  type ('a, 'b) pair_repr = {
+    (* Run the pair by feeding its components to any continuation f. *)
+    run : 'c. ('a repr -> 'b repr -> 'c repr) -> 'c repr;
+  }
+
+  let pair x y =
+    {
+      run =
+        (fun f ->
+          (* Encode pair as λg. g x y using existing primitives. *)
+          let encoded = lam (fun g -> app (app g x) y) in
+          (* Convert OCaml continuation f into a tagless representation. *)
+          app encoded (lam (fun a -> lam (fun b -> f a b))));
+    }
+
+  let fst p =
+    (* Use continuation that selects the first component. *)
+    p.run (fun a _ -> a)
+
+  let snd p =
+    (* Use continuation that selects the second component. *)
+    p.run (fun _ b -> b)
+end
+
 module Eval : Symantics with type 'a repr = 'a = struct
   type 'a repr = 'a
 
