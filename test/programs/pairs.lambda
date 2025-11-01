@@ -1,0 +1,3 @@
+-- expect: error todo: pair
+let mk = fun (x : int) -> fun (y : bool) -> (x, y) in
+snd (mk 0 true)

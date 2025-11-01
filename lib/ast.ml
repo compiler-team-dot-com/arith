@@ -1,5 +1,5 @@
 type binop = Add | Sub | Mul | Div | Eq | And | Or
-type typ = TInt | TBool | TArrow of typ * typ
+type typ = TInt | TBool | TPair of typ * typ | TArrow of typ * typ
 
 type expr =
   | Int of int
@@ -9,11 +9,16 @@ type expr =
   | App of expr * expr
   | Let of string * typ option * expr * expr
   | If of expr * expr * expr
+  | Pair of expr * expr
+  | Fst of expr
+  | Snd of expr
   | BinOp of binop * expr * expr
 
 let rec typ_to_string = function
   | TInt -> "int"
   | TBool -> "bool"
+  | TPair (lhs, rhs) ->
+      "(" ^ typ_to_string lhs ^ " * " ^ typ_to_string rhs ^ ")"
   | TArrow (lhs, rhs) ->
       let lhs_str =
         match lhs with
@@ -47,5 +52,8 @@ let rec to_string = function
   | If (cond, t_branch, f_branch) ->
       "if " ^ to_string cond ^ " then " ^ to_string t_branch ^ " else "
       ^ to_string f_branch
+  | Pair (lhs, rhs) -> "(" ^ to_string lhs ^ ", " ^ to_string rhs ^ ")"
+  | Fst expr -> "fst " ^ to_string expr
+  | Snd expr -> "snd " ^ to_string expr
   | BinOp (op, lhs, rhs) ->
       "(" ^ to_string lhs ^ " " ^ binop_to_string op ^ " " ^ to_string rhs ^ ")"

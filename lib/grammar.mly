@@ -8,11 +8,12 @@ open Ast
 %token FUN LET IN IF THEN ELSE
 %token ARROW
 %token LPAREN RPAREN
-%token COLON
+%token COLON COMMA
 %token PLUS MINUS TIMES DIV
 %token EQUAL
 %token AND OR
 %token TYPE_INT TYPE_BOOL
+%token FST SND
 %token EOF
 
 %right ARROW
@@ -67,10 +68,12 @@ atom:
   | TRUE { Bool true }
   | FALSE { Bool false }
   | IDENT { Var $1 }
+  | LPAREN expr COMMA expr RPAREN { Pair ($2, $4) }
   | LPAREN expr RPAREN { $2 }
 
 typ:
   | TYPE_INT { TInt }
   | TYPE_BOOL { TBool }
+  | typ TIMES typ { TPair ($1, $3) }
   | typ ARROW typ { TArrow ($1, $3) }
   | LPAREN typ RPAREN { $2 }

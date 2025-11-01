@@ -16,8 +16,6 @@ module type Symantics = sig
   val let_ : 'a repr -> ('a repr -> 'b repr) -> 'b repr
 end
 
-[@@@ocaml.warning "-32"]
-
 module type Symantics_with_pairs = sig
   include Symantics
 
@@ -27,8 +25,6 @@ module type Symantics_with_pairs = sig
   val fst : ('a, 'b) pair_repr -> 'a repr
   val snd : ('a, 'b) pair_repr -> 'b repr
 end
-
-[@@@ocaml.warning "+32"]
 
 module Derived (S : Symantics) :
   Symantics_with_pairs with type 'a repr = 'a S.repr = struct
@@ -115,6 +111,7 @@ exception Type_error of string
 type _ ty =
   | TInt : int ty
   | TBool : bool ty
+  | TPair : 'a ty * 'b ty -> ('a * 'b) ty
   | TArrow : 'a ty * 'b ty -> ('a -> 'b) ty
 
 type (_, _) eq = Refl : ('a, 'a) eq
@@ -136,11 +133,13 @@ type packed_ty = Pack_ty : 'a ty -> packed_ty
 let rec typ_of_ty : type a. a ty -> Ast.typ = function
   | TInt -> Ast.TInt
   | TBool -> Ast.TBool
+  | TPair (l, r) -> Ast.TPair (typ_of_ty l, typ_of_ty r)
   | TArrow (l, r) -> Ast.TArrow (typ_of_ty l, typ_of_ty r)
 
 let rec ty_of_typ = function
   | Ast.TInt -> Pack_ty TInt
   | Ast.TBool -> Pack_ty TBool
+  | Ast.TPair (_lhs, _rhs) -> raise (Type_error "todo: pair")
   | Ast.TArrow (lhs, rhs) ->
       let (Pack_ty lhs') = ty_of_typ lhs in
       let (Pack_ty rhs') = ty_of_typ rhs in
@@ -150,6 +149,7 @@ let rec typ_equal lhs rhs =
   match (lhs, rhs) with
   | Ast.TInt, Ast.TInt -> true
   | Ast.TBool, Ast.TBool -> true
+  | Ast.TPair (l1, r1), Ast.TPair (l2, r2) -> typ_equal l1 l2 && typ_equal r1 r2
   | Ast.TArrow (l1, r1), Ast.TArrow (l2, r2) ->
       typ_equal l1 l2 && typ_equal r1 r2
   | _ -> false
@@ -162,6 +162,9 @@ module Annotated = struct
   and node =
     | Int of int
     | Bool of bool
+    | Pair of t * t
+    | Fst of t
+    | Snd of t
     | Var of string
     | Lambda of string * Ast.typ * t
     | App of t * t
@@ -192,6 +195,9 @@ end = struct
     match expr with
     | Ast.Int n -> { typ = Ast.TInt; node = Int n }
     | Ast.Bool b -> { typ = Ast.TBool; node = Bool b }
+    | Ast.Pair (_lhs_expr, _rhs_expr) -> raise (Type_error "todo: pair")
+    | Ast.Fst _expr -> raise (Type_error "todo: fst")
+    | Ast.Snd _expr -> raise (Type_error "todo: snd")
     | Ast.Var name ->
         let typ = lookup env name in
         { typ; node = Var name }
@@ -300,6 +306,9 @@ module Elaborate (S : Symantics) = struct
     match expr.node with
     | Int n -> Pack (TInt, S.int n)
     | Bool b -> Pack (TBool, S.bool b)
+    | Pair _ -> raise (Type_error "todo: pair eval")
+    | Fst _ -> raise (Type_error "todo: fst eval")
+    | Snd _ -> raise (Type_error "todo: snd eval")
     | Var name ->
         let (Pack (ty, value)) = lookup env name in
         Pack (ty, value)
@@ -416,11 +425,14 @@ type eval_result = Eval_result : 'a ty * 'a -> eval_result
 (* Convert a runtime result into a human-readable string, collapsing functions
    to a placeholder while showing primitive values. *)
 let string_of_eval_result (Eval_result (ty, value)) =
-  let aux : type a. a ty -> a -> string =
+  let rec aux : type a. a ty -> a -> string =
    fun ty value ->
     match ty with
     | TInt -> string_of_int value
     | TBool -> string_of_bool value
+    | TPair (lhs_ty, rhs_ty) ->
+        let lhs, rhs = value in
+        "(" ^ aux lhs_ty lhs ^ ", " ^ aux rhs_ty rhs ^ ")"
     | TArrow _ -> "<fun>"
   in
   aux ty value

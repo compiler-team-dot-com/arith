@@ -34,6 +34,7 @@ rule token =
   | '(' { LPAREN }
   | ')' { RPAREN }
   | ':' { COLON }
+  | ',' { COMMA }
   | '+' { PLUS }
   | '-' { MINUS }
   | '*' { TIMES }

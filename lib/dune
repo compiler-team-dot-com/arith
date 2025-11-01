@@ -5,3 +5,11 @@
  (modules grammar))
 
 (ocamllex lexer)
+
+(env
+ (dev
+  (flags
+   (:standard -w -37 -w -32)))
+ (release
+  (flags
+   (:standard -w +37 -w +32))))
