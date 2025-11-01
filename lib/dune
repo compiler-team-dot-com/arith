@@ -9,7 +9,10 @@
 (env
  (dev
   (flags
-   (:standard -w -37 -w -32)))
+   (:standard -w -32-37)))
+ ; ignore “unused stub” warnings while iterating
  (release
   (flags
-   (:standard -w +37 -w +32))))
+   (:standard -w +32+37 -warn-error +a)))
+ ; treat every warning as an error in CI/builds
+ )
