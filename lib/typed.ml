@@ -195,9 +195,23 @@ end = struct
     match expr with
     | Ast.Int n -> { typ = Ast.TInt; node = Int n }
     | Ast.Bool b -> { typ = Ast.TBool; node = Bool b }
-    | Ast.Pair (_lhs_expr, _rhs_expr) -> raise (Type_error "todo: pair")
-    | Ast.Fst _expr -> raise (Type_error "todo: fst")
-    | Ast.Snd _expr -> raise (Type_error "todo: snd")
+    | Ast.Pair (lhs_expr, rhs_expr) ->
+        let lhs_ann = annotate env lhs_expr in
+        let rhs_ann = annotate env rhs_expr in
+        {
+          typ = Ast.TPair (lhs_ann.typ, rhs_ann.typ);
+          node = Pair (lhs_ann, rhs_ann);
+        }
+    | Ast.Fst expr ->
+        let expr_ann = annotate env expr in
+        (match expr_ann.typ with
+        | Ast.TPair (lhs_typ, _) -> { typ = lhs_typ; node = Fst expr_ann }
+        | _ -> raise (Type_error "fst expects a pair"))
+    | Ast.Snd expr ->
+        let expr_ann = annotate env expr in
+        (match expr_ann.typ with
+        | Ast.TPair (_, rhs_typ) -> { typ = rhs_typ; node = Snd expr_ann }
+        | _ -> raise (Type_error "snd expects a pair"))
     | Ast.Var name ->
         let typ = lookup env name in
         { typ; node = Var name }
