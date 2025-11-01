@@ -57,6 +57,8 @@ prod:
 
 application:
   | application atom { App ($1, $2) }
+  | FST application { Fst $2 }
+  | SND application { Snd $2 }
   | atom { $1 }
 
 let_annotation:

@@ -14,6 +14,8 @@
    | "false" -> FALSE
    | "int" -> TYPE_INT
    | "bool" -> TYPE_BOOL
+   | "fst" -> FST
+   | "snd" -> SND
    | ident -> IDENT ident
 }
 
